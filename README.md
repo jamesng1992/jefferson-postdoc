@@ -1,6 +1,6 @@
 # Jefferson DS Postdoc — Panel Problems (TD3, GAN, CL)
 
-Hey Reproducible code and docs for the Jefferson Lab Data Scientist Postdoc panel on **September 18**.
+Reproducible code and docs for the Jefferson Lab Data Scientist Postdoc panel on **September 18**.
 This repo contains:
 - **Problem 1**: TD3 on `Gymnasium` `Pendulum-v1` with learning-behavior plots.
 - **Problem 2**: Keras GAN reproducing the eICU age distribution; includes comparison plots (hist/KDE, CDF, Q–Q).
