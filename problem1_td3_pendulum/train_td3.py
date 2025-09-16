@@ -95,10 +95,26 @@ def main():
             print(f"Step {total_steps}: last ep return {ep_returns[-1]:.1f}")
 
     os.makedirs(args.out_dir, exist_ok=True)
-    agent.actor.save(os.path.join(args.out_dir, 'td3_actor.keras'))
-    agent.critic1.save(os.path.join(args.out_dir, 'td3_critic1.keras'))
-    agent.critic2.save(os.path.join(args.out_dir, 'td3_critic2.keras'))
-    plot_curves(steps_track, ep_returns, critic_losses, actor_losses, os.path.join('plots'))
+
+    # --- SAVE FIRST (so even if plotting fails, you keep the models) ---
+    actor_path  = os.path.join(args.out_dir, 'td3_actor.keras')
+    critic1_path = os.path.join(args.out_dir, 'td3_critic1.keras')
+    critic2_path = os.path.join(args.out_dir, 'td3_critic2.keras')
+
+    agent.actor.save(actor_path)
+    agent.critic1.save(critic1_path)
+    agent.critic2.save(critic2_path)
+    print(f"[SAVE] Actor -> {actor_path}")
+    print(f"[SAVE] Critic1 -> {critic1_path}")
+    print(f"[SAVE] Critic2 -> {critic2_path}")
+
+    # --- PLOT (never crash training if matplotlib/Tk acts up) ---
+    try:
+        plot_curves(steps_track, ep_returns, critic_losses, actor_losses, os.path.join('plots'))
+        print("[PLOT] Wrote learning_returns.png and losses.png")
+    except Exception as e:
+        print(f"[PLOT] Skipped due to error: {e}")
+
 
 if __name__ == '__main__':
     main()
