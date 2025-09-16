@@ -11,4 +11,4 @@ git commit -m "Initial commit: panel problems"
 git remote add origin https://github.com/<YOUR_USERNAME>/jefferson-postdoc.git
 git push -u origin main
 ```
-4) Verify on GitHub. Share the link with the panel (they ask that code is available the **day prior**).
+4) Verify on GitHub. Share the link with the panel.
