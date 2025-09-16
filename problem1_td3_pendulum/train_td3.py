@@ -94,21 +94,26 @@ def main():
         if total_steps % args.log_every == 0 and ep_returns:
             print(f"Step {total_steps}: last ep return {ep_returns[-1]:.1f}")
 
-    os.makedirs(args.out_dir, exist_ok=True)
+        # --- periodic checkpoint save every 5k steps ---
+        if total_steps % 5000 == 0:
+            os.makedirs(args.out_dir, exist_ok=True)
+            ckpt_path = os.path.join(args.out_dir, f"td3_actor_step{total_steps}.keras")
+            agent.actor.save(ckpt_path)
+            print(f"[SAVE] Actor checkpoint -> {ckpt_path}")
 
-    # --- SAVE FIRST (so even if plotting fails, you keep the models) ---
-    actor_path  = os.path.join(args.out_dir, 'td3_actor.keras')
+    # --- FINAL SAVE FIRST (so plotting issues won't lose models) ---
+    os.makedirs(args.out_dir, exist_ok=True)
+    actor_path   = os.path.join(args.out_dir, 'td3_actor.keras')
     critic1_path = os.path.join(args.out_dir, 'td3_critic1.keras')
     critic2_path = os.path.join(args.out_dir, 'td3_critic2.keras')
-
     agent.actor.save(actor_path)
     agent.critic1.save(critic1_path)
     agent.critic2.save(critic2_path)
-    print(f"[SAVE] Actor -> {actor_path}")
-    print(f"[SAVE] Critic1 -> {critic1_path}")
-    print(f"[SAVE] Critic2 -> {critic2_path}")
+    print(f"[FINAL SAVE] Actor  -> {actor_path}")
+    print(f"[FINAL SAVE] Critic1-> {critic1_path}")
+    print(f"[FINAL SAVE] Critic2-> {critic2_path}")
 
-    # --- PLOT (never crash training if matplotlib/Tk acts up) ---
+    # --- Plot, but never crash training if backend has issues ---
     try:
         plot_curves(steps_track, ep_returns, critic_losses, actor_losses, os.path.join('plots'))
         print("[PLOT] Wrote learning_returns.png and losses.png")
