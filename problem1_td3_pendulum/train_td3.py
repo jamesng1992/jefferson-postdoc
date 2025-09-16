@@ -1,16 +1,23 @@
+# problem1_td3_pendulum/train_td3.py
 import os, argparse, numpy as np, matplotlib.pyplot as plt
 import gymnasium as gym
 import tensorflow as tf
 from replay_buffer import ReplayBuffer
 from td3_agent import TD3Agent
 
-def plot_curves(steps, ep_returns, critic_losses, actor_losses, out_dir):
-    os.makedirs(out_dir, exist_ok=True)
+# --- fixed paths: always inside this folder ---
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR = os.path.join(BASE_DIR, "results")
+PLOTS_DIR   = os.path.join(BASE_DIR, "plots")
+os.makedirs(RESULTS_DIR, exist_ok=True)
+os.makedirs(PLOTS_DIR, exist_ok=True)
+
+def plot_curves(steps, ep_returns, critic_losses, actor_losses):
     # Learning returns
     plt.figure()
     plt.plot(steps, ep_returns)
     plt.xlabel('Env steps'); plt.ylabel('Episode return'); plt.title('TD3: Return vs Steps'); plt.grid(True)
-    plt.tight_layout(); plt.savefig(os.path.join(out_dir, 'learning_returns.png')); plt.close()
+    plt.tight_layout(); plt.savefig(os.path.join(PLOTS_DIR, 'learning_returns.png')); plt.close()
 
     # Losses
     c1, c2 = zip(*critic_losses) if critic_losses else ([], [])
@@ -18,8 +25,9 @@ def plot_curves(steps, ep_returns, critic_losses, actor_losses, out_dir):
     if c1: plt.plot(c1, label='Critic1 MSE')
     if c2: plt.plot(c2, label='Critic2 MSE')
     if actor_losses: plt.plot(actor_losses, label='Actor (−Q)')
-    plt.legend(); plt.grid(True); plt.title('Losses')
-    plt.tight_layout(); plt.savefig(os.path.join(out_dir, 'losses.png')); plt.close()
+    if c1 or actor_losses: plt.legend()
+    plt.grid(True); plt.title('Losses')
+    plt.tight_layout(); plt.savefig(os.path.join(PLOTS_DIR, 'losses.png')); plt.close()
 
 def main():
     ap = argparse.ArgumentParser()
@@ -34,9 +42,9 @@ def main():
     ap.add_argument('--exploration-noise', type=float, default=0.1)
     ap.add_argument('--seed', type=int, default=0)
     ap.add_argument('--log-every', type=int, default=1000)
-    ap.add_argument('--out-dir', type=str, default='results')
     args = ap.parse_args()
 
+    # Env & seeds
     env = gym.make('Pendulum-v1')
     env.reset(seed=args.seed)
     np.random.seed(args.seed)
@@ -52,16 +60,15 @@ def main():
 
     buf = ReplayBuffer(obs_dim, act_dim, size=int(1e6))
 
-    o, info = env.reset()
+    o, _ = env.reset()
     ep_ret, ep_len, total_steps = 0.0, 0, 0
     ep_returns, critic_losses, actor_losses, steps_track = [], [], [], []
 
-    while total_steps < args.total-steps if False else total_steps < args.total_steps:  # guard against hyphen typo
-        if total_steps < args.start_steps:
-            a = env.action_space.sample()
-        else:
-            a = agent.select_action(o, noise_scale=args.exploration_noise)
+    while total_steps < args.total_steps:
+        # act
+        a = env.action_space.sample() if total_steps < args.start_steps else agent.select_action(o, noise_scale=args.exploration_noise)
 
+        # step
         o2, r, terminated, truncated, _ = env.step(a)
         done = terminated or truncated
         buf.store(o, a, r, o2, float(done))
@@ -69,9 +76,10 @@ def main():
 
         if done:
             ep_returns.append(ep_ret); steps_track.append(total_steps)
-            o, info = env.reset()
+            o, _ = env.reset()
             ep_ret, ep_len = 0.0, 0
 
+        # updates
         if total_steps >= args.start_steps:
             batch = buf.sample_batch(args.batch_size)
             obs = tf.convert_to_tensor(batch['obs'], dtype=tf.float32)
@@ -94,18 +102,16 @@ def main():
         if total_steps % args.log_every == 0 and ep_returns:
             print(f"Step {total_steps}: last ep return {ep_returns[-1]:.1f}")
 
-        # --- periodic checkpoint save every 5k steps ---
+        # periodic checkpoint every 5k steps
         if total_steps % 5000 == 0:
-            os.makedirs(args.out_dir, exist_ok=True)
-            ckpt_path = os.path.join(args.out_dir, f"td3_actor_step{total_steps}.keras")
+            ckpt_path = os.path.join(RESULTS_DIR, f"td3_actor_step{total_steps}.keras")
             agent.actor.save(ckpt_path)
             print(f"[SAVE] Actor checkpoint -> {ckpt_path}")
 
-    # --- FINAL SAVE FIRST (so plotting issues won't lose models) ---
-    os.makedirs(args.out_dir, exist_ok=True)
-    actor_path   = os.path.join(args.out_dir, 'td3_actor.keras')
-    critic1_path = os.path.join(args.out_dir, 'td3_critic1.keras')
-    critic2_path = os.path.join(args.out_dir, 'td3_critic2.keras')
+    # FINAL SAVE first
+    actor_path   = os.path.join(RESULTS_DIR, 'td3_actor.keras')
+    critic1_path = os.path.join(RESULTS_DIR, 'td3_critic1.keras')
+    critic2_path = os.path.join(RESULTS_DIR, 'td3_critic2.keras')
     agent.actor.save(actor_path)
     agent.critic1.save(critic1_path)
     agent.critic2.save(critic2_path)
@@ -113,13 +119,12 @@ def main():
     print(f"[FINAL SAVE] Critic1-> {critic1_path}")
     print(f"[FINAL SAVE] Critic2-> {critic2_path}")
 
-    # --- Plot, but never crash training if backend has issues ---
+    # Plot but never crash training
     try:
-        plot_curves(steps_track, ep_returns, critic_losses, actor_losses, os.path.join('plots'))
-        print("[PLOT] Wrote learning_returns.png and losses.png")
+        plot_curves(steps_track, ep_returns, critic_losses, actor_losses)
+        print(f"[PLOT] Wrote plots to {PLOTS_DIR}")
     except Exception as e:
         print(f"[PLOT] Skipped due to error: {e}")
-
 
 if __name__ == '__main__':
     main()
