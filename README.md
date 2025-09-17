@@ -25,9 +25,7 @@ pip install -r requirements.txt
 
 ## Problem 1 — TD3 on Pendulum-v1
 
-### Quick Start
-
-#### 0) Setup
+### 0) Setup
 Open **Anaconda Prompt** and activate your project environment:
 ```cmd
 conda activate jlab-postdoc
@@ -36,7 +34,7 @@ cd %USERPROFILE%\jefferson-postdoc
 
 ---
 
-#### 1) Fast demo run (5–10 min on CPU)
+### 1) Fast demo run (5–10 min on CPU)
 
 Train and generate the core plots:
 
@@ -64,7 +62,7 @@ Outputs:
 
 ---
 
-#### 2) Optional: Action statistics
+### 2) Optional: Action statistics
 
 Generate extra figures from the trained actor:
 
@@ -81,7 +79,7 @@ Outputs:
 
 ---
 
-#### 3) Better learning (if you have more time)
+### 3) Better learning (if you have more time)
 
 Run longer training for smoother curves:
 
@@ -102,7 +100,7 @@ python problem1_td3_pendulum\train_td3.py ^
 
 ---
 
-#### 4) Push results to GitHub
+### 4) Push results to GitHub
 
 From the repo root:
 
@@ -114,7 +112,7 @@ git push
 
 ---
 
-#### 5) Troubleshooting
+### 5) Troubleshooting
 
 * **No plots / TkAgg error**
   Use `set MPLBACKEND=Agg` (or make it permanent with
