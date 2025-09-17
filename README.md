@@ -62,20 +62,152 @@ Outputs:
 
 ---
 
-#### 2) Optional: Action statistics
+Absolutely — here’s a **ready-to-paste Markdown** section for your `README.md` covering **Problem 2 (GAN for eICU ages)** with the fixes we added (saving `generator.keras` + `norm_params.npz`, headless plotting, etc.).
 
-Generate extra figures from the trained actor:
+---
+
+## Problem 2 — GAN reproducing the eICU age distribution
+
+This experiment trains a small GAN to model the empirical age distribution and produces three diagnostic figures:
+`hist_overlay.png`, `cdf_overlay.png`, and `qq_plot.png`.
+
+> **Outputs**  
+> - Models/params → `problem2_gan_age/results/generator.keras`, `problem2_gan_age/results/norm_params.npz`  
+> - Figures → `problem2_gan_age/figures/hist_overlay.png`, `cdf_overlay.png`, `qq_plot.png`
+
+---
+
+### 0) Setup
+
+Open **Anaconda Prompt**:
+
+```cmd
+conda activate jlab-postdoc
+cd %USERPROFILE%\jefferson-postdoc
+````
+
+---
+
+### 1) Train (fast demo)
+
+This writes the generator + normalization parameters into `results/`.
 
 ```cmd
 set MPLBACKEND=Agg
-python problem1_td3_pendulum\make_action_stats.py --checkpoint problem1_td3_pendulum\results\td3_actor.keras --episodes 5
-explorer problem1_td3_pendulum\plots
+python problem2_gan_age\train_gan.py --epochs 2000 --batch-size 256 --latent-dim 64
 ```
 
-Outputs:
+Check that files were saved:
 
-* `action_stats.png`
-* `action_episode_means.png`
+```cmd
+dir problem2_gan_age\results
+```
+
+You should see **non-zero** sizes for:
+
+* `generator.keras`
+* `norm_params.npz`
+
+---
+
+### 2) Evaluate & make plots
+
+The evaluator uses a headless Matplotlib backend and always writes proper PNGs.
+
+```cmd
+python problem2_gan_age\eval_gan.py --num-samples 100000
+dir problem2_gan_age\figures
+explorer problem2_gan_age\figures
+```
+
+You should now have:
+
+* `hist_overlay.png` — histogram/KDE overlay (true vs. generated)
+* `cdf_overlay.png` — CDF curves overlay
+* `qq_plot.png` — Q–Q plot (diagonal = perfect match)
+
+---
+
+### 3) Push results to GitHub
+
+```cmd
+git add problem2_gan_age\train_gan.py ^
+        problem2_gan_age\results\generator.keras ^
+        problem2_gan_age\results\norm_params.npz ^
+        problem2_gan_age\figures\hist_overlay.png ^
+        problem2_gan_age\figures\cdf_overlay.png ^
+        problem2_gan_age\figures\qq_plot.png
+git commit -m "Problem 2: GAN results (generator + norm params + figures)"
+git push
+```
+
+---
+
+### 4) Better training presets (optional)
+
+If you have more time and want smoother figures:
+
+**Balanced (panel-ready):**
+
+```cmd
+python problem2_gan_age\train_gan.py --epochs 4000 --batch-size 256 --latent-dim 64
+python problem2_gan_age\eval_gan.py --num-samples 200000
+```
+
+**Stronger:**
+
+```cmd
+python problem2_gan_age\train_gan.py --epochs 8000 --batch-size 256 --latent-dim 64
+python problem2_gan_age\eval_gan.py --num-samples 300000
+```
+
+Tips:
+
+* If training is unstable, try a larger batch (e.g., `--batch-size 512`) or lower `--lr-g/--lr-d` inside `train_gan.py`.
+* For quick checks, reduce `--num-samples` in eval (e.g., `50000`) to render faster.
+
+---
+
+### 5) Troubleshooting
+
+**PNG files are 0 bytes**
+
+* Likely `results/generator.keras` or `results/norm_params.npz` is missing. Re-run training and confirm they exist (non-zero size) before evaluating.
+* Ensure headless plotting is enabled: `set MPLBACKEND=Agg`.
+
+**`FileNotFoundError: norm_params.npz`**
+
+* Train first; those params are written at the end of `train_gan.py`.
+
+**No `results/` files after training**
+
+* Make sure you’re using the revised `train_gan.py` that saves:
+
+  * `problem2_gan_age/results/generator.keras`
+  * `problem2_gan_age/results/norm_params.npz`
+
+**Matplotlib/Tk errors**
+
+* Use the non-GUI backend: `set MPLBACKEND=Agg` (or make it permanent with
+  `conda env config vars set MPLBACKEND=Agg` → deactivate & reactivate the env).
+
+---
+
+### 6) File layout (after a successful run)
+
+```
+problem2_gan_age/
+├─ data_loader.py
+├─ train_gan.py
+├─ eval_gan.py
+├─ results/
+│  ├─ generator.keras
+│  └─ norm_params.npz
+└─ figures/
+   ├─ hist_overlay.png
+   ├─ cdf_overlay.png
+   └─ qq_plot.png
+```
 
 ---
 
