@@ -134,8 +134,6 @@ git push
 * **Stop long run**
   Press **Ctrl+C** once. Checkpoints are saved before plotting.
 
-```
-
 ---
 
 ## Problem 2 — GAN reproducing the eICU age distribution
