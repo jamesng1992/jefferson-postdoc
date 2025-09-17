@@ -21,6 +21,8 @@ python -m venv .venv && source .venv/bin/activate  # On Windows: .venv\Scripts\a
 pip install -r requirements.txt
 ```
 
+---
+
 ## Problem 1 — TD3 on Pendulum-v1
 
 ### Quick Start
@@ -62,7 +64,77 @@ Outputs:
 
 ---
 
-Absolutely — here’s a **ready-to-paste Markdown** section for your `README.md` covering **Problem 2 (GAN for eICU ages)** with the fixes we added (saving `generator.keras` + `norm_params.npz`, headless plotting, etc.).
+#### 2) Optional: Action statistics
+
+Generate extra figures from the trained actor:
+
+```cmd
+set MPLBACKEND=Agg
+python problem1_td3_pendulum\make_action_stats.py --checkpoint problem1_td3_pendulum\results\td3_actor.keras --episodes 5
+explorer problem1_td3_pendulum\plots
+```
+
+Outputs:
+
+* `action_stats.png`
+* `action_episode_means.png`
+
+---
+
+#### 3) Better learning (if you have more time)
+
+Run longer training for smoother curves:
+
+```cmd
+set MPLBACKEND=Agg
+set TF_NUM_INTRAOP_THREADS=4
+set TF_NUM_INTEROP_THREADS=2
+set OMP_NUM_THREADS=4
+
+python problem1_td3_pendulum\train_td3.py ^
+  --total-steps 150000 ^
+  --start-steps 8000 ^
+  --batch-size 256 ^
+  --exploration-noise 0.1 ^
+  --log-every 5000 ^
+  --seed 0
+```
+
+---
+
+#### 4) Push results to GitHub
+
+From the repo root:
+
+```cmd
+git add problem1_td3_pendulum\plots\*.png problem1_td3_pendulum\results\td3_actor.keras
+git commit -m "TD3 results: learning curves + (optional) action stats"
+git push
+```
+
+---
+
+#### 5) Troubleshooting
+
+* **No plots / TkAgg error**
+  Use `set MPLBACKEND=Agg` (or make it permanent with
+
+  ```cmd
+  conda env config vars set MPLBACKEND=Agg
+  conda deactivate & conda activate jlab-postdoc
+  ```
+
+  ).
+* **Missing gymnasium**
+  Ensure `(jlab-postdoc)` is active:
+
+  ```cmd
+  python -c "import gymnasium; print(gymnasium.__version__)"
+  ```
+* **Stop long run**
+  Press **Ctrl+C** once. Checkpoints are saved before plotting.
+
+```
 
 ---
 
@@ -208,79 +280,6 @@ problem2_gan_age/
    ├─ cdf_overlay.png
    └─ qq_plot.png
 ```
-
----
-
-#### 3) Better learning (if you have more time)
-
-Run longer training for smoother curves:
-
-```cmd
-set MPLBACKEND=Agg
-set TF_NUM_INTRAOP_THREADS=4
-set TF_NUM_INTEROP_THREADS=2
-set OMP_NUM_THREADS=4
-
-python problem1_td3_pendulum\train_td3.py ^
-  --total-steps 150000 ^
-  --start-steps 8000 ^
-  --batch-size 256 ^
-  --exploration-noise 0.1 ^
-  --log-every 5000 ^
-  --seed 0
-```
-
----
-
-#### 4) Push results to GitHub
-
-From the repo root:
-
-```cmd
-git add problem1_td3_pendulum\plots\*.png problem1_td3_pendulum\results\td3_actor.keras
-git commit -m "TD3 results: learning curves + (optional) action stats"
-git push
-```
-
----
-
-#### 5) Troubleshooting
-
-* **No plots / TkAgg error**
-  Use `set MPLBACKEND=Agg` (or make it permanent with
-
-  ```cmd
-  conda env config vars set MPLBACKEND=Agg
-  conda deactivate & conda activate jlab-postdoc
-  ```
-
-  ).
-* **Missing gymnasium**
-  Ensure `(jlab-postdoc)` is active:
-
-  ```cmd
-  python -c "import gymnasium; print(gymnasium.__version__)"
-  ```
-* **Stop long run**
-  Press **Ctrl+C** once. Checkpoints are saved before plotting.
-
-## Problem 2: GAN for eICU Age Distribution
-
-`train_gan.py` will download `eICU_age.npy` automatically into the folder if not present.
-
-### Train
-```bash
-python problem2_gan_age/train_gan.py --epochs 2000 --batch-size 256 --latent-dim 64
-```
-
-### Evaluate & plots
-```bash
-python problem2_gan_age/eval_gan.py --num-samples 100000
-```
-Outputs:
-- `problem2_gan_age/figures/hist_overlay.png`
-- `problem2_gan_age/figures/cdf_overlay.png`
-- `problem2_gan_age/figures/qq_plot.png`
 
 ---
 
