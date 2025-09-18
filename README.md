@@ -279,11 +279,68 @@ problem2_gan_age/
 
 ---
 
-## Problem 3: Continual Learning (CL)
+# Problem 3 — Continual Learning (CL)
 
-See PDFs in `problem3_continual_learning/`:
-- `CL_review.pdf`
-- `CL_solution_blueprint.pdf`
+This folder documents **Problem 3** from the Data Scientist Postdoc interview.  
+It addresses catastrophic forgetting in classification with known task boundaries.
+
+---
+
+## Deliverables
+
+- `Problem3_ContinualLearning_Comprehensive.pdf` — detailed literature review, solution formulation, evaluation protocol, blueprint, and Q&A.
+- `Problem3_CL_CheatSheet.pdf` — 1-page summary for quick reference and panel Q&A.
+
+---
+
+## Quick Start Guide
+
+### 0) Open the documents
+```cmd
+conda activate jlab-postdoc
+cd %USERPROFILE%\jefferson-postdoc
+explorer problem3_continual_learning
+```
+
+Files to present:
+- **Comprehensive PDF**: `Problem3_ContinualLearning_Comprehensive.pdf`
+- **Cheat Sheet**: `Problem3_CL_CheatSheet.pdf`
+
+---
+
+### 1) Storyline (60s pitch)
+- **Problem:** Catastrophic forgetting when models adapt sequentially.
+- **Goal:** Learn new tasks with minimal forgetting, bounded memory/compute.
+- **Chosen Solution:** Replay + KD + Online-EWC.
+- **Why:** Replay protects input coverage, KD preserves function behavior, EWC stabilizes critical weights.
+- **Metrics:** Avg Accuracy, BWT, FWT, footprint.
+
+---
+
+### 2) What to show the panel
+1. Taxonomy slide: Replay / Regularization / Architecture.
+2. Solution slide: Replay+KD+EWC loop.
+3. Metrics slide: definitions of Avg Acc, BWT, FWT.
+4. Q&A slide: baseline, privacy, conflicts, risks.
+
+---
+
+### 3) GitHub workflow
+```cmd
+git add Problem3_ContinualLearning_Comprehensive.pdf Problem3_CL_CheatSheet.pdf
+git commit -m "Problem 3: Comprehensive CL solution + cheat sheet"
+git push
+```
+
+---
+
+## File Layout
+
+```
+problem3_continual_learning/
+├─ Problem3_ContinualLearning_Comprehensive.pdf
+├─ Problem3_CL_CheatSheet.pdf
+```
 
 ---
 
