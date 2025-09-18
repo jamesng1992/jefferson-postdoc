@@ -281,15 +281,17 @@ problem2_gan_age/
 
 # Problem 3 — Continual Learning (CL)
 
-This folder documents **Problem 3** from the Data Scientist Postdoc interview.  
+This folder contains the deliverables for **Problem 3** of the Data Scientist Postdoc interview.  
 It addresses catastrophic forgetting in classification with known task boundaries.
 
 ---
 
 ## Deliverables
 
-- `Problem3_ContinualLearning_Comprehensive.pdf` — detailed literature review, solution formulation, evaluation protocol, blueprint, and Q&A.
-- `Problem3_CL_CheatSheet.pdf` — 1-page summary for quick reference and panel Q&A.
+1. **CL_review.pdf** — concise literature review of continual learning methods (Replay, Regularization, Architectural) with pros/cons and key takeaways.  
+2. **CL_solution_blueprint.pdf** — practical blueprint for Replay+KD+EWC: training loop, hyper-parameters, evaluation protocol, and governance.  
+3. **Problem3_ContinualLearning_Comprehensive.pdf** — detailed, expanded write-up combining review, formulated solution, evaluation plan, and anticipated Q&A.  
+4. **Problem3_CL_CheatSheet.pdf** — 1-page summary of taxonomy, chosen approach, metrics, and equations (for quick panel reference).  
 
 ---
 
@@ -302,33 +304,23 @@ cd %USERPROFILE%\jefferson-postdoc
 explorer problem3_continual_learning
 ```
 
-Files to present:
-- **Comprehensive PDF**: `Problem3_ContinualLearning_Comprehensive.pdf`
-- **Cheat Sheet**: `Problem3_CL_CheatSheet.pdf`
-
----
-
 ### 1) Storyline (60s pitch)
-- **Problem:** Catastrophic forgetting when models adapt sequentially.
-- **Goal:** Learn new tasks with minimal forgetting, bounded memory/compute.
-- **Chosen Solution:** Replay + KD + Online-EWC.
-- **Why:** Replay protects input coverage, KD preserves function behavior, EWC stabilizes critical weights.
-- **Metrics:** Avg Accuracy, BWT, FWT, footprint.
+- **Problem:** Catastrophic forgetting when models adapt sequentially.  
+- **Goal:** Learn new tasks with minimal forgetting, bounded memory/compute.  
+- **Chosen Solution:** Replay + KD + Online-EWC.  
+- **Why:** Replay preserves inputs, KD preserves function behavior, EWC stabilizes critical weights.  
+- **Metrics:** Avg Accuracy, BWT, FWT, memory/latency footprint.  
 
----
-
-### 2) What to show the panel
-1. Taxonomy slide: Replay / Regularization / Architecture.
-2. Solution slide: Replay+KD+EWC loop.
-3. Metrics slide: definitions of Avg Acc, BWT, FWT.
-4. Q&A slide: baseline, privacy, conflicts, risks.
-
----
+### 2) What to show in the panel
+- CL_review.pdf → taxonomy of methods, pros/cons.  
+- CL_solution_blueprint.pdf → chosen solution and evaluation plan.  
+- (Optional) Problem3_ContinualLearning_Comprehensive.pdf → background reference.  
+- Problem3_CL_CheatSheet.pdf → 1-page visual summary for Q&A.  
 
 ### 3) GitHub workflow
 ```cmd
-git add Problem3_ContinualLearning_Comprehensive.pdf Problem3_CL_CheatSheet.pdf
-git commit -m "Problem 3: Comprehensive CL solution + cheat sheet"
+git add CL_review.pdf CL_solution_blueprint.pdf Problem3_ContinualLearning_Comprehensive.pdf Problem3_CL_CheatSheet.pdf
+git commit -m "Problem 3: Deliverables (review, blueprint, comprehensive doc, cheat sheet)"
 git push
 ```
 
@@ -338,8 +330,11 @@ git push
 
 ```
 problem3_continual_learning/
+├─ CL_review.pdf
+├─ CL_solution_blueprint.pdf
 ├─ Problem3_ContinualLearning_Comprehensive.pdf
 ├─ Problem3_CL_CheatSheet.pdf
+├─ README.md
 ```
 
 ---
